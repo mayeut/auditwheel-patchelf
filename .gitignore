@@ -1,4 +1,11 @@
+# patchelf patched sources
+src/patchelf/
+src/auditwheel_patchelf/_version.py
+
 # Byte-compiled / optimized / DLL files
+src/auditwheel_patchelf/patchelf
+tests/elf_binaries/foo
+tests/elf_binaries/libfoo.so.1
 __pycache__/
 *.py[cod]
 *$py.class

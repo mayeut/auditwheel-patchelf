@@ -1,0 +1,43 @@
+language: python
+python: 3.5
+os: linux
+dist: bionic
+services:
+  - docker
+
+
+# use YAML aliases and anchors to avoid duplication in stages
+# c.f. https://github.com/travis-ci/travis-ci/issues/8295#issuecomment-454457787
+_build-wheel: &build-wheel
+      stage: "build wheel"
+      script:
+        - python3 setup.py sdist
+        - ./ci/build_wheel.sh $(find dist -name '*.tar.gz') dist
+        - if [ "$(uname -m)" != "x86_64" ]; then rm dist/*.tar.gz; fi
+      before_deploy:
+        - ls dist/
+      # Deploy master non-tags to test PyPI
+      deploy:
+        - provider: pypi
+          server: https://test.pypi.org/legacy/
+          username: __token__
+          password:
+            secure: "YjIKL5RbR2Xk5yfIwilfEJQFY0YY9abO/+qaxVC23hecrtfoiomTsGOhxgkXnNNPuOVBuUhPGoQQymfzHFUshvtjC9dMDHIfTuP0z11xD6f600QPOdYFCpygxPnH/YHwKKmxm9QBbr1Z4hz6jcpsX26UVdj3Mg2Ub63uLtz9TceYjBOG0YGQxnHwRFn6hGevCiYteMPSvsrnPTpyepmeGUMymPGVMlECNx0YKiuT7Zi8eKizEPOmVVi8HkdJzM/OnNgY7A9CPKx8RfrqqPbGL6H1K89vUW1TGKsT1Hs+PyOqys+LzDIAwYEC4SZezjYnuN9chfAJ650l4ODttZByHe3GJTCoBj6s+cNjd84x0FWLeb3hblARLyw49XFThNNz4DIhJJI/HiJxXuLHnYh1Q/ilRb4J8bi78gv6IsAYIg1YPdonx88mMN8K3UAuk9P7YcW7qrZ/AVdRHiKhBZ5nBYJjMVkZ+8LowRfWQze3SEVk7+1s10VRYgLRzyl0fizKE09fD1cN/Zzf+C5ZXvPcRpa5KQ6neGWMxZkVEGOkkqoi+x9JzTx6Z005D+cw7TbifJDwdcJ4gIKYcoT4l5DftKL5ABzGE+BXhmsTrSZXI5fa7uVm6zm9T4lL4w4rOLnY/+w0bffBCNN2wmqjFj/egutEzAilULLzgvwQQWVV9yw="
+          distributions: prepare
+          skip_existing: true
+          skip_cleanup: true
+          on:
+            repo: mayeut/auditwheel-patchelf
+            tags: false
+            branch: master
+
+jobs:
+  include:
+    - <<: *build-wheel
+      arch: amd64
+    - <<: *build-wheel
+      arch: arm64
+    - <<: *build-wheel
+      arch: ppc64le
+    - <<: *build-wheel
+      arch: s390x

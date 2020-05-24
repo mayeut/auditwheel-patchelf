@@ -1,0 +1,2 @@
+setuptools==46.4.0
+wheel==0.34.2
