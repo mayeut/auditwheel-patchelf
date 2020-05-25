@@ -198,7 +198,6 @@ setup(
     ],
     entry_points={
         "console_scripts": [
-            "patchelf=auditwheel_patchelf:_main",
             "auditwheel_patchelf=auditwheel_patchelf:_main",
         ],
     },
